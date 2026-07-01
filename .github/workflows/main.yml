@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - name: Checkout Code Securely
         uses: actions/checkout@v4
@@ -63,9 +63,22 @@ jobs:
           }
           EOF
 
-      - name: Run Verified Core Compiler Environment
-        uses: beerpiss/theos-action@master
+      - name: Install Theos Framework Offline
+        run: |
+          export THEOS=$GITHUB_WORKSPACE/theos
+          git clone --depth=1 --recursive https://github.com $THEOS
 
+      - name: Install iOS SDK Securely
+        uses: actions/checkout@v4
+        with:
+          repository: theos/sdks
+          path: 'theos/sdks'
+
+      - name: Compile and Package DEB
+        run: |
+          export THEOS=$GITHUB_WORKSPACE/theos
+          make package FINALPACKAGE=1
+          
       - name: Upload Finished DEB Artifact
         uses: actions/upload-artifact@v4
         with:
