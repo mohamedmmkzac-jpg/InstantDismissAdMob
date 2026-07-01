@@ -73,6 +73,12 @@ jobs:
           repository: theos/sdks
           path: 'theos/sdks'
 
+      - name: Install Linux iOS Toolchain (Compiler)
+        run: |
+          # تحميل المترجم المخصص لتجميع ملفات الأيفون على بيئة اللينكس بأمان
+          mkdir -p $GITHUB_WORKSPACE/theos/toolchain/linux/iphone
+          curl -ksL "https://github.com" | tar -xf - -C $GITHUB_WORKSPACE/theos/toolchain/linux/iphone/
+
       - name: Compile and Package DEB
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
