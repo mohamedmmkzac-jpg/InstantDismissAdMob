@@ -1,18 +1,15 @@
 name: Build Tweak Package
 on: [push, workflow_dispatch]
 
-# إضافة الصلاحيات الأمنية لمنع خطأ الـ 128 بشكل نهائي
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          clean: true
+      - name: Manual Pull Code
+        run: |
+          # السحب اليدوي للمستودع لتخطي أخطاء جيت هب نهائياً
+          git clone https://github.com{{ github.repository }}.git .
+          git checkout ${{ github.ref_name }}
 
       - name: Install Theos and iOS SDK Manually
         run: |
