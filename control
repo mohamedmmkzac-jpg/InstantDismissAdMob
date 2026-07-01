@@ -3,7 +3,7 @@ Name: InstantDismissAdMob
 Depends: mobilesubstrate
 Version: 1.0.0
 Architecture: iphoneos-arm
-Description: Instantly dismiss Google Full Screen Ads for Airvoy App.
+Description: Instantly dismiss Google Ads for Airvoy App.
 Maintainer: Mohamed Khaled
 Author: Mohamed Khaled
 Section: Tweaks
