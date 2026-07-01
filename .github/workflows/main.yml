@@ -1,0 +1,23 @@
+name: Build Theos Package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build package
+        uses: Randomblock1/theos-action@v1
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-package
+          path: packages/*.deb
