@@ -5,11 +5,64 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Manual Pull Code
+      - name: Auto Create Project Files Offline
         run: |
-          # السحب اليدوي للمستودع لتخطي أخطاء جيت هب نهائياً
-          git clone https://github.com{{ github.repository }}.git .
-          git checkout ${{ github.ref_name }}
+          # 1. صناعة ملف الـ control
+          cat << 'EOF' > control
+          Package: com.mohamed.instantdismiss
+          Name: InstantDismissAdMob
+          Depends: mobilesubstrate
+          Version: 1.0.0
+          Architecture: iphoneos-arm
+          Description: Instantly dismiss Google Ads for Airvoy App.
+          Maintainer: Mohamed Khaled
+          Author: Mohamed Khaled
+          Section: Tweaks
+          EOF
+
+          # 2. صناعة ملف الـ Makefile
+          cat << 'EOF' > Makefile
+          TARGET := iphone:clang:latest:14.0
+          ARCHS = arm64 arm64e
+          
+          include $(THEOS)/makefiles/common.mk
+          
+          TWEAK_NAME = InstantDismissAdMob
+          
+          InstantDismissAdMob_FILES = Tweak.x
+          InstantDismissAdMob_CFLAGS = -fobjc-arc -w -DTHEOS_LEAN_AND_MEAN
+          
+          include $(THEOS_MAKE_PATH)/tweak.mk
+          EOF
+
+          # 3. صناعة ملف الـ Tweak.x
+          cat << 'EOF' > Tweak.x
+          #import <Foundation/Foundation.h>
+          
+          @interface NSObject
+          - (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion;
+          @end
+          
+          %hook GADFullScreenAdViewController
+          
+          - (void)viewDidAppear:(BOOL)animated {
+              %orig;
+              dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                  [self dismissViewControllerAnimated:YES completion:nil];
+              });
+          }
+          
+          %end
+          EOF
+
+          # 4. صناعة ملف الـ plist
+          cat << 'EOF' > InstantDismissAdMob.plist
+          {
+              Filter = {
+                  Bundles = ( "com.apple.UIKit" );
+              };
+          }
+          EOF
 
       - name: Install Theos and iOS SDK Manually
         run: |
