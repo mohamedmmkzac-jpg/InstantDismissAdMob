@@ -5,6 +5,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code Securely
+        uses: actions/checkout@v4
+
       - name: Auto Create Project Files Offline
         run: |
           cat << 'EOF' > control
@@ -60,29 +63,10 @@ jobs:
           }
           EOF
 
-      - name: Pull Theos Framework Securely
-        uses: actions/checkout@v4
+      - name: Run Verified Core Compiler Environment
+        uses: beerpiss/theos-action@v1
         with:
-          repository: theos/theos
-          submodules: recursive
-          path: 'theos'
-
-      - name: Pull iOS SDK Securely
-        uses: actions/checkout@v4
-        with:
-          repository: theos/sdks
-          path: 'theos/sdks'
-
-      - name: Install Linux iOS Toolchain (Compiler)
-        run: |
-          # تحميل المترجم المخصص لتجميع ملفات الأيفون على بيئة اللينكس بأمان
-          mkdir -p $GITHUB_WORKSPACE/theos/toolchain/linux/iphone
-          curl -ksL "https://github.com" | tar -xf - -C $GITHUB_WORKSPACE/theos/toolchain/linux/iphone/
-
-      - name: Compile and Package DEB
-        run: |
-          export THEOS=$GITHUB_WORKSPACE/theos
-          make package FINALPACKAGE=1
+          theos_src: 'theos/theos'
 
       - name: Upload Finished DEB Artifact
         uses: actions/upload-artifact@v4
