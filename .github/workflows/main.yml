@@ -70,4 +70,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Airvoy-InstantDismiss-DEB
-          path: "**/*.deb"
+          path: /home/runner/work/InstantDismissAdMob/InstantDismissAdMob/packages/*.deb
