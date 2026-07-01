@@ -20,3 +20,4 @@ jobs:
         with:
           name: Airvoy-InstantDismiss-DEB
           path: packages/*.deb
+
