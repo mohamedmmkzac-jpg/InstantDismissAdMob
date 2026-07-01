@@ -1,0 +1,33 @@
+name: Build Tweak Package
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Theos and iOS SDK Manually
+        run: |
+          # 1. تحميل بيئة الـ Theos الأساسية
+          export THEOS=~/theos
+          git clone --recursive https://github.com $THEOS
+          
+          # 2. تحميل الـ iOS SDK الرسمي والمضمون بدون حجب
+          mkdir -p $THEOS/sdks
+          curl -ksL "https://github.com" -o ~/theos/sdks.zip
+          unzip -q ~/theos/sdks.zip -d ~/theos/
+          rm -rf $THEOS/sdks && mv ~/theos/sdks-master $THEOS/sdks
+          rm ~/theos/sdks.zip
+
+      - name: Compile and Package DEB
+        run: |
+          export THEOS=~/theos
+          make package FINALPACKAGE=1
+
+      - name: Upload Finished DEB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Airvoy-InstantDismiss-DEB
+          path: packages/*.deb
