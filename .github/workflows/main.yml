@@ -60,23 +60,22 @@ jobs:
           }
           EOF
 
-      - name: Install Theos and iOS SDK From GitLab Mirror
-        run: |
-          export THEOS=~/theos
-          
-          # التحميل من شبكة GitLab البديلة والمؤمنة ضد الحجب وقص الروابط
-          git clone --depth=1 --recursive https://gitlab.com $THEOS
-          
-          # تحميل الـ iOS SDK النظيف مباشرة بدون جيت هب
-          mkdir -p $THEOS/sdks
-          curl -ksL "https://gitlab.com" -o ~/theos/sdks.zip
-          unzip -q ~/theos/sdks.zip -d ~/theos/
-          rm -rf $THEOS/sdks && mv ~/theos/sdks-master $THEOS/sdks
-          rm ~/theos/sdks.zip
+      - name: Pull Theos Framework Securely
+        uses: actions/checkout@v4
+        with:
+          repository: theos/theos
+          submodules: recursive
+          path: 'theos'
+
+      - name: Pull iOS SDK Securely
+        uses: actions/checkout@v4
+        with:
+          repository: theos/sdks
+          path: 'theos/sdks'
 
       - name: Compile and Package DEB
         run: |
-          export THEOS=~/theos
+          export THEOS=$GITHUB_WORKSPACE/theos
           make package FINALPACKAGE=1
 
       - name: Upload Finished DEB Artifact
