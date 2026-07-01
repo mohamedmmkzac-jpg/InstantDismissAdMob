@@ -5,11 +5,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Fix Git Security Protocol
-        run: |
-          # حل مشكلة الصلاحيات وملكيات الملفات داخل السيرفر لمنع خطأ 128
-          git config --global --add safe.directory '*'
-
       - name: Auto Create Project Files Offline
         run: |
           cat << 'EOF' > control
@@ -65,14 +60,16 @@ jobs:
           }
           EOF
 
-      - name: Install Theos and iOS SDK Manually
+      - name: Install Theos and iOS SDK From GitLab Mirror
         run: |
           export THEOS=~/theos
-          # سحب الـ Theos بدون ملفات التاريخ العميقة لتسريع العملية وتجنب التوقف
-          git clone --depth=1 --recursive https://github.com $THEOS
           
+          # التحميل من شبكة GitLab البديلة والمؤمنة ضد الحجب وقص الروابط
+          git clone --depth=1 --recursive https://gitlab.com $THEOS
+          
+          # تحميل الـ iOS SDK النظيف مباشرة بدون جيت هب
           mkdir -p $THEOS/sdks
-          curl -ksL "https://github.com" -o ~/theos/sdks.zip
+          curl -ksL "https://gitlab.com" -o ~/theos/sdks.zip
           unzip -q ~/theos/sdks.zip -d ~/theos/
           rm -rf $THEOS/sdks && mv ~/theos/sdks-master $THEOS/sdks
           rm ~/theos/sdks.zip
@@ -80,11 +77,9 @@ jobs:
       - name: Compile and Package DEB
         run: |
           export THEOS=~/theos
-          # تشغيل التجميع المفصل لطباعة السطر المعطل بالظبط
-          make package FINALPACKAGE=1 messages=yes
-          
+          make package FINALPACKAGE=1
+
       - name: Upload Finished DEB Artifact
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Airvoy-InstantDismiss-DEB
