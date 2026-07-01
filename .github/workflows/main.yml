@@ -64,9 +64,7 @@ jobs:
           EOF
 
       - name: Run Verified Core Compiler Environment
-        uses: beerpiss/theos-action@v1
-        with:
-          theos_src: 'theos/theos'
+        uses: beerpiss/theos-action@master
 
       - name: Upload Finished DEB Artifact
         uses: actions/upload-artifact@v4
