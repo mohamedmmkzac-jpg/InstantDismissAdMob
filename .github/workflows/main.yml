@@ -1,17 +1,18 @@
 name: Build Tweak Package
 on: [push, workflow_dispatch]
 
+# إضافة الصلاحيات الأمنية لمنع خطأ الـ 128 بشكل نهائي
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           clean: true
-          fetch-depth: 1
 
       - name: Install Theos and iOS SDK Manually
         run: |
