@@ -1,9 +1,8 @@
-name: Build Theos Package
+name: Build Tweak
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -11,13 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Build package
-        uses: Randomblock1/theos-action@v1
+    - name: Setup Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fake编译 tools build-essential clang lzma liblzma-dev libssl-dev
+        echo "THEOS=~/theos" >> $GITHUB_ENV
 
-      - name: Upload package
-        uses: actions/upload-artifact@v4
-        with:
-          name: deb-package
-          path: packages/*.deb
+    - name: Install Theos & SDK
+      run: |
+        git clone --recursive https://github.com/theos/theos.git ~/theos
+        curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz
+        mkdir -p ~/theos/sdks
+        tar -xf iPhoneOS14.5.sdk.tar.xz -C ~/theos/sdks/
+        rm iPhoneOS14.5.sdk.tar.xz
+
+    - name: Build Tweak (.deb)
+      run: |
+        export THEOS=~/theos
+        make package FINALPACKAGE=1
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: InstantDismissAdMob-Deb
+        path: packages/*.deb
