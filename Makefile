@@ -6,7 +6,6 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = InstantDismissAdMob
 
 InstantDismissAdMob_FILES = Tweak.x
-InstantDismissAdMob_CFLAGS = -fobjc-arc
-InstantDismissAdMob_CFLAGS += -fno-modules
+InstantDismissAdMob_CFLAGS = -fobjc-arc -w -DTHEOS_LEAN_AND_MEAN
 
 include $(THEOS_MAKE_PATH)/tweak.mk
